@@ -1,0 +1,21 @@
+# Eclipse
+.project
+.classpath
+.settings
+
+# IntelliJ IDEA
+.idea
+*.iml
+out
+
+# Gradle
+.gradle
+build
+
+# OS
+Thumbs.db
+.DS_Store
+
+bin/*
+/build
+/logs

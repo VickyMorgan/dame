@@ -1,0 +1,51 @@
+# Von hier: https://gist.github.com/daicham/5ac8461b8b49385244aa0977638c3420
+image: openjdk:8-jdk
+
+stages:
+  - test
+  - build
+  - doc
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+  # Install JavaFX
+  # https://gitlab.com/gitlab-com/support-forum/issues/537
+  # https://github.com/docker-library/openjdk/issues/158
+  - apt-get update && apt-get install -y --no-install-recommends openjfx && rm -rf /var/lib/apt/lists/*
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  stage: build
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+  script:
+    - ./gradlew build -x test
+test:
+  stage: test
+  artifacts:
+    paths:
+      - build/reports/tests/test
+      - build/reports/jacoco/test/html
+    expire_in: 1 week
+    when: always
+  script:
+    - ./gradlew test
+    - ./gradlew jacocoTestReport
+    - cat build/reports/jacoco/test/html/index.html
+
+doc:
+  stage: doc
+  artifacts:
+      paths:
+        - build/docs/javadoc
+      expire_in: 1 week
+      when: always
+  script:
+    - ./gradlew javadoc
